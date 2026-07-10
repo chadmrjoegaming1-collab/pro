@@ -733,7 +733,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- COCKPIT/EMERGENCY ALARM CONTROLLER ---
   const alarmBtn = document.getElementById('alarmBtn');
+  const uploadBtn = document.getElementById('uploadBtn');
+  const alarmUploader = document.getElementById('alarmUploader');
+  const alarmStatusTooltip = document.getElementById('alarmStatusTooltip');
   const simulatorSection = document.getElementById('simulator');
+
   let alarmAudio = null;
   let isAlarmPlaying = false;
   let synthAlarmInterval = null;
@@ -741,6 +745,52 @@ document.addEventListener('DOMContentLoaded', () => {
   // Track active synthesized nodes to force terminate them immediately when turning off the alarm
   let activeSynthOscillators = [];
   let activeSynthGains = [];
+
+  // Flag to know if the user uploaded custom audio
+  let hasUploadedAudio = false;
+
+  // File Upload Handlers
+  uploadBtn.addEventListener('click', () => {
+    alarmUploader.click();
+  });
+
+  alarmUploader.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      try {
+        const fileUrl = URL.createObjectURL(file);
+
+        // Stop current alarm playback if any exists
+        if (alarmAudio) {
+          alarmAudio.pause();
+        }
+
+        // Initialize new Audio with user file blob url
+        alarmAudio = new Audio(fileUrl);
+        alarmAudio.loop = true;
+        hasUploadedAudio = true;
+
+        // Visual Feedback
+        alarmStatusTooltip.textContent = `Custom Alarm Loaded: "${file.name}"`;
+        alarmStatusTooltip.style.color = "var(--color-accent-green)";
+        uploadBtn.innerHTML = `<i class="fa-solid fa-circle-check"></i> LOADED`;
+        uploadBtn.style.borderColor = "var(--color-accent-green)";
+        uploadBtn.style.color = "var(--color-accent-green)";
+
+        // Reset alarm trigger if currently playing to switch tracks seamlessly
+        if (isAlarmPlaying) {
+          // Temporarily toggle state to false, run off logic, and toggle back on
+          isAlarmPlaying = false;
+          alarmBtn.click();
+        }
+
+      } catch (err) {
+        console.error("Failed to load uploaded file", err);
+        alarmStatusTooltip.textContent = "Failed to load audio file.";
+        alarmStatusTooltip.style.color = "var(--color-accent-red)";
+      }
+    }
+  });
 
   // Synthesize standard cruise ship emergency alarm sound (7 short and 1 long blast)
   const playSynthesizedEmergencyAlarm = () => {
@@ -830,23 +880,35 @@ document.addEventListener('DOMContentLoaded', () => {
       teleAlert.textContent = "GENERAL EMERGENCY ALARM";
       teleAlert.className = "tele-val value-alert";
 
-      // Attempt to load and play user's local absolute Windows file path
-      const filePath = "C:\\Users\\stude\\Music\\MP3Skull\\Cruise Ship Emergency Alarm, Evacuation Lifejacket Instructions & Prohibitions (Carnival Cruise).mp3";
+      if (hasUploadedAudio && alarmAudio) {
+        // Play the uploaded custom audio file
+        alarmAudio.play()
+          .then(() => {
+            console.log("Uploaded custom audio played successfully.");
+          })
+          .catch(err => {
+            console.error("Failed to play uploaded audio, falling back to synthesizer...", err);
+            playSynthesizedEmergencyAlarm();
+          });
+      } else {
+        // Attempt to load and play user's local absolute Windows file path
+        const filePath = "C:\\Users\\stude\\Music\\MP3Skull\\Cruise Ship Emergency Alarm, Evacuation Lifejacket Instructions & Prohibitions (Carnival Cruise).mp3";
 
-      if (!alarmAudio) {
-        alarmAudio = new Audio(filePath);
-        alarmAudio.loop = true;
+        if (!alarmAudio) {
+          alarmAudio = new Audio(filePath);
+          alarmAudio.loop = true;
+        }
+
+        alarmAudio.play()
+          .then(() => {
+            console.log("Local Windows file audio played successfully.");
+          })
+          .catch(err => {
+            console.warn("Local absolute file access is blocked by browser security sandbox policies. Falling back to dynamic procedural Web Audio synthesis...", err);
+            // Launch synthesis engine
+            playSynthesizedEmergencyAlarm();
+          });
       }
-
-      alarmAudio.play()
-        .then(() => {
-          console.log("Local audio played successfully.");
-        })
-        .catch(err => {
-          console.warn("Local absolute file access is blocked by browser security sandbox policies. Falling back to dynamic procedural Web Audio synthesis...", err);
-          // Launch synthesis engine
-          playSynthesizedEmergencyAlarm();
-        });
 
     } else {
       alarmBtn.classList.remove('active');
