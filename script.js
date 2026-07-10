@@ -626,6 +626,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let alarmAudio = null;
   let isAlarmPlaying = false;
   let synthAlarmInterval = null;
+  let customAlarmAudio = null; // Store user-uploaded audio
 
   // Track active synthesized nodes to force terminate them immediately when turning off the alarm
   let activeSynthOscillators = [];
@@ -719,23 +720,22 @@ document.addEventListener('DOMContentLoaded', () => {
       teleAlert.textContent = "GENERAL EMERGENCY ALARM";
       teleAlert.className = "tele-val value-alert";
 
-      // Attempt to load and play user's local absolute Windows file path
-      const filePath = "C:\\Users\\stude\\Music\\MP3Skull\\Cruise Ship Emergency Alarm, Evacuation Lifejacket Instructions & Prohibitions (Carnival Cruise).mp3";
-
-      if (!alarmAudio) {
-        alarmAudio = new Audio(filePath);
-        alarmAudio.loop = true;
+      // Priority: Use custom uploaded audio if available
+      if (customAlarmAudio) {
+        customAlarmAudio.currentTime = 0;
+        customAlarmAudio.loop = true;
+        customAlarmAudio.play()
+          .then(() => {
+            console.log("Custom alarm audio played successfully.");
+          })
+          .catch(err => {
+            console.warn("Custom audio playback failed, falling back to synthesis...", err);
+            playSynthesizedEmergencyAlarm();
+          });
+      } else {
+        // Fallback to synthesized alarm
+        playSynthesizedEmergencyAlarm();
       }
-
-      alarmAudio.play()
-        .then(() => {
-          console.log("Local audio played successfully.");
-        })
-        .catch(err => {
-          console.warn("Local absolute file access is blocked by browser security sandbox policies. Falling back to dynamic procedural Web Audio synthesis...", err);
-          // Launch synthesis engine
-          playSynthesizedEmergencyAlarm();
-        });
 
     } else {
       alarmBtn.classList.remove('active');
@@ -744,10 +744,10 @@ document.addEventListener('DOMContentLoaded', () => {
       teleAlert.textContent = "CLEAR / NORMAL";
       teleAlert.className = "tele-val value-green";
 
-      // 1. Stop local absolute Audio if playing
-      if (alarmAudio) {
-        alarmAudio.pause();
-        alarmAudio.currentTime = 0;
+      // 1. Stop custom audio if playing
+      if (customAlarmAudio) {
+        customAlarmAudio.pause();
+        customAlarmAudio.currentTime = 0;
       }
 
       // 2. Stop scheduled Synth timeouts
@@ -773,6 +773,59 @@ document.addEventListener('DOMContentLoaded', () => {
       activeSynthOscillators = [];
       activeSynthGains = [];
     }
+  });
+
+  // --- AUDIO FILE UPLOAD HANDLER ---
+  const audioUploadBtn = document.getElementById('audioUploadBtn');
+  const audioFileInput = document.getElementById('audioFileInput');
+  const uploadStatus = document.getElementById('uploadStatus');
+
+  audioUploadBtn.addEventListener('click', () => {
+    audioFileInput.click();
+  });
+
+  audioFileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate file size (max 50MB)
+    const maxSize = 50 * 1024 * 1024; // 50MB in bytes
+    if (file.size > maxSize) {
+      uploadStatus.textContent = '❌ File too large (max 50MB)';
+      uploadStatus.style.color = '#e74c3c';
+      setTimeout(() => {
+        uploadStatus.textContent = '';
+      }, 3000);
+      return;
+    }
+
+    // Validate file type
+    const validTypes = ['audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/webm', 'audio/mp4'];
+    if (!validTypes.includes(file.type)) {
+      uploadStatus.textContent = '❌ Invalid audio format (MP3, WAV, OGG, WebM supported)';
+      uploadStatus.style.color = '#e74c3c';
+      setTimeout(() => {
+        uploadStatus.textContent = '';
+      }, 3000);
+      return;
+    }
+
+    // Create blob URL from file
+    const audioURL = URL.createObjectURL(file);
+    
+    // Create audio element and set source
+    customAlarmAudio = new Audio();
+    customAlarmAudio.src = audioURL;
+    
+    // Show success message
+    uploadStatus.textContent = `✓ Loaded: ${file.name}`;
+    uploadStatus.style.color = '#2ecc71';
+    audioUploadBtn.innerHTML = `<i class="fa-solid fa-check"></i> CUSTOM ALARM LOADED`;
+    audioUploadBtn.style.background = 'linear-gradient(135deg, #2ecc71 0%, #27ae60 100%)';
+
+    setTimeout(() => {
+      uploadStatus.textContent = '';
+    }, 4000);
   });
 
   // --- FAQ ACCORDION INTERACTIVITY ---
