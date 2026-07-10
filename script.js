@@ -649,19 +649,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const osc1 = audioCtx.createOscillator();
         const osc2 = audioCtx.createOscillator();
 
+        // Replicate deep, powerful, low-frequency Carnival Cruise horn blasts (55Hz / 82.4Hz)
         osc1.type = 'sawtooth';
-        osc1.frequency.setValueAtTime(440, audioCtx.currentTime); // Pitch A4
-        osc2.type = 'square';
-        osc2.frequency.setValueAtTime(444, audioCtx.currentTime); // Detuned peak for discordant alarm vibe
+        osc1.frequency.setValueAtTime(55, audioCtx.currentTime); // A1 note - deep rumbling frequency
+        osc2.type = 'triangle';
+        osc2.frequency.setValueAtTime(82.4, audioCtx.currentTime); // E2 note - harmonic frequency
 
         gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-        gainNode.gain.linearRampToValueAtTime(0.4, audioCtx.currentTime + 0.05);
-        gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime + duration - 0.05);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+        gainNode.gain.linearRampToValueAtTime(0.6, audioCtx.currentTime + 0.1); // Fast attack
+        gainNode.gain.setValueAtTime(0.6, audioCtx.currentTime + duration - 0.1);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration); // Smooth decay
 
         const filter = audioCtx.createBiquadFilter();
-        filter.type = 'bandpass';
-        filter.frequency.setValueAtTime(600, audioCtx.currentTime);
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(300, audioCtx.currentTime); // Soften high harmonic peaks
 
         osc1.connect(filter);
         osc2.connect(filter);
