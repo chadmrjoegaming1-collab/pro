@@ -368,6 +368,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let rudderAngle = 0; // Angle of rudder (-35 to +35 degrees)
   let targetThrust = 0; // Desired thrust percentage from slider (0 - 100)
   let currentThrust = 0; // Actual current engine thrust ramping up/down
+  let hullHealth = 100; // Hull health percentage (0 - 100)
+  let activeEnvironment = "daylight"; // current active weather/time environment
 
   // Environmental modifiers
   let windSpeed = 10; // Knots
@@ -391,6 +393,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const windReadout = document.getElementById('windReadout');
   const waveReadout = document.getElementById('waveReadout');
 
+  // Hull health elements
+  const hullHealthBar = document.getElementById('hullHealthBar');
+  const hullHealthText = document.getElementById('hullHealthText');
+  const repairBtn = document.getElementById('repairBtn');
+
+  // Voyage Ledger elements
+  const ledgerEntries = document.getElementById('ledgerEntries');
+  const manualLogBtn = document.getElementById('manualLogBtn');
+
   // Steering controls buttons
   const steerLeft = document.getElementById('steerLeft');
   const steerCenter = document.getElementById('steerCenter');
@@ -400,6 +411,12 @@ document.addEventListener('DOMContentLoaded', () => {
   windSlider.addEventListener('input', (e) => {
     windSpeed = +e.target.value;
     windReadout.textContent = `${windSpeed} KTS`;
+    // If wind is high during storm, generate wave variations
+    if (activeEnvironment === 'storm' && windSpeed > 40) {
+      waveHeight = Math.min(15, 3.5 + (windSpeed - 40) * 0.3);
+      waveSlider.value = waveHeight;
+      waveReadout.textContent = `${waveHeight.toFixed(1)}m`;
+    }
   });
 
   waveSlider.addEventListener('input', (e) => {
@@ -519,9 +536,54 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     teleDepth.textContent = `${depth.toFixed(1)} M`;
 
-    // 5. Alarms / Alerts trigger
-    if (depth < 15.0) {
-      teleAlert.textContent = "SHALLOW WATER";
+    // 5. Hull Integrity depletion & automatic logging
+    let damageRate = 0;
+    if (depth < 15.0 && speedKts > 2.0) {
+      damageRate += 0.08 * (speedKts / 5.0); // grounded on reef/shoal
+    }
+    if (waveHeight > 10.0 && speedKts > 5.0) {
+      damageRate += 0.04 * (speedKts / 10.0); // structural heavy wave slamming
+    }
+
+    if (damageRate > 0 && hullHealth > 0) {
+      const oldHealth = Math.floor(hullHealth);
+      hullHealth = Math.max(0, hullHealth - damageRate);
+      const newHealth = Math.floor(hullHealth);
+
+      // Update UI bar & text
+      hullHealthBar.style.width = `${hullHealth}%`;
+      hullHealthText.textContent = `${Math.floor(hullHealth)}%`;
+
+      // Update bar colors based on health
+      if (hullHealth > 60) {
+        hullHealthText.style.color = "var(--color-accent-green)";
+        hullHealthBar.style.background = "linear-gradient(90deg, var(--color-accent-red) 0%, var(--color-accent-yellow) 50%, var(--color-accent-green) 100%)";
+      } else if (hullHealth > 25) {
+        hullHealthText.style.color = "var(--color-accent-yellow)";
+        hullHealthBar.style.background = "var(--color-accent-yellow)";
+      } else {
+        hullHealthText.style.color = "var(--color-accent-red)";
+        hullHealthBar.style.background = "var(--color-accent-red)";
+      }
+
+      // Show Repair button
+      repairBtn.style.display = "block";
+
+      // Log structural warnings dynamically to Captain's Ledger
+      if (oldHealth > newHealth && newHealth % 15 === 0) {
+        appendLedgerEntry(`WARNING: Hull structural integrity dropped to ${newHealth}% due to ${depth < 15.0 ? 'reef grounding' : 'extreme sea swell slamming'}!`);
+      }
+    }
+
+    // 6. Alarms / Alerts trigger
+    if (hullHealth <= 0) {
+      teleAlert.textContent = "SINKING / ABANDON SHIP";
+      teleAlert.className = "tele-val value-alert";
+      if (!isAlarmPlaying) {
+        alarmBtn.click(); // auto trigger general alarm if ship is sinking
+      }
+    } else if (depth < 15.0) {
+      teleAlert.textContent = "SHALLOW WATER GROUNDING";
       teleAlert.className = "tele-val value-alert";
     } else if (windSpeed > 45.0) {
       teleAlert.textContent = "EXTREME WIND GUSTS";
@@ -993,6 +1055,115 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   });
+
+  // --- LEDGER JOURNAL WRITING ENGINE ---
+  const appendLedgerEntry = (message) => {
+    if (!ledgerEntries) return;
+
+    // Remove placeholder on first entry
+    const placeholder = ledgerEntries.querySelector('.ledger-placeholder');
+    if (placeholder) {
+      placeholder.remove();
+    }
+
+    const entryDiv = document.createElement('div');
+    entryDiv.className = 'ledger-entry';
+
+    const now = new Date();
+    const stampStr = now.toTimeString().split(' ')[0]; // HH:MM:SS format
+
+    entryDiv.innerHTML = `
+      <span class="entry-timestamp">[${stampStr}]</span>
+      <span class="entry-text">${message}</span>
+    `;
+
+    // Insert at top/beginning for premium logbook scrolling feel
+    ledgerEntries.insertBefore(entryDiv, ledgerEntries.firstChild);
+
+    // Caps logs to preserve performance
+    while (ledgerEntries.children.length > 25) {
+      ledgerEntries.removeChild(ledgerEntries.lastChild);
+    }
+  };
+
+  // Manual Position Logging Button Handler
+  if (manualLogBtn) {
+    manualLogBtn.addEventListener('click', () => {
+      const headingText = teleHeading.textContent;
+      const speedText = teleSpeed.textContent;
+      appendLedgerEntry(`Manual telemetry lock: Heading ${headingText}, speed ${speedText}. Ship systems operational.`);
+    });
+  }
+
+  // Periodic voyage logger when cruising safely
+  let voyageLogInterval = setInterval(() => {
+    if (speedKts > 5.0 && hullHealth > 10) {
+      const roundedHeading = Math.round(heading);
+      appendLedgerEntry(`Voyage Update: Cruising safely at ${speedKts.toFixed(1)} KTS. Course set to ${roundedHeading.toString().padStart(3, '0')}°. Depth ${depth.toFixed(1)} M.`);
+    }
+  }, 20000); // every 20 seconds of sustained sailing
+
+  // --- ATMOSPHERIC & ENVIRONMENTAL SELECTOR ENGINE ---
+  const envButtons = document.querySelectorAll('.env-mode-btn');
+
+  envButtons.forEach(ebtn => {
+    ebtn.addEventListener('click', () => {
+      envButtons.forEach(b => b.classList.remove('active'));
+      ebtn.classList.add('active');
+
+      const envMode = ebtn.getAttribute('data-env');
+      activeEnvironment = envMode;
+
+      // Clear all environmental backdrops
+      simulatorSection.classList.remove('env-sunset', 'env-night', 'env-storm');
+
+      if (envMode === 'daylight') {
+        appendLedgerEntry("Atmosphere changed: Clear daylight skies. Standard visibility conditions.");
+      } else if (envMode === 'sunset') {
+        simulatorSection.classList.add('env-sunset');
+        appendLedgerEntry("Atmosphere changed: Sunset golden hour. Twilight visibility patterns active.");
+      } else if (envMode === 'night') {
+        simulatorSection.classList.add('env-night');
+        appendLedgerEntry("Atmosphere changed: Night sailing mode. Navigational spotlights and beacons illuminated.");
+      } else if (envMode === 'storm') {
+        simulatorSection.classList.add('env-storm');
+        appendLedgerEntry("WEATHER ALERT: Extreme localized storm cell encountered. High waves and rolling thunder active!");
+
+        // Elevate physics dials to extreme weather presets automatically
+        windSpeed = 48;
+        windSlider.value = 48;
+        windReadout.textContent = "48 KTS";
+
+        waveHeight = 7.5;
+        waveSlider.value = 7.5;
+        waveReadout.textContent = "7.5m";
+      }
+    });
+  });
+
+  // --- REPAIR HULL SYSTEM INTERACTION ---
+  if (repairBtn) {
+    repairBtn.addEventListener('click', () => {
+      hullHealth = 100;
+      hullHealthBar.style.width = '100%';
+      hullHealthText.textContent = '100%';
+      hullHealthText.style.color = "var(--color-accent-green)";
+      hullHealthBar.style.background = "linear-gradient(90deg, var(--color-accent-red) 0%, var(--color-accent-yellow) 50%, var(--color-accent-green) 100%)";
+
+      // Hide button post-repair
+      repairBtn.style.display = "none";
+
+      appendLedgerEntry("REPAIR: Hull damage successfully sealed. Watertight doors restored. Integrity 100%.");
+
+      // Auto turn off alarm if sinking was active
+      if (isAlarmPlaying) {
+        alarmBtn.click();
+      }
+    });
+  }
+
+  // Log Initial Bridge Activation Entry
+  appendLedgerEntry("Captain's Log: Bridge instruments and electronic charts initialized successfully.");
 
   // Start the Bridge Simulator simulation loops
   updateSimulation();

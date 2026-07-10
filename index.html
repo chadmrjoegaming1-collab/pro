@@ -402,20 +402,35 @@
 
   <!-- CAPTAIN'S BRIDGE MINI-SIMULATOR -->
   <section id="simulator" class="simulator-section">
+    <!-- Lightning Flash Overlay for Storm Environment -->
+    <div class="storm-lightning-flash"></div>
+
     <div class="section-header">
       <h2 class="section-title">THE CAPTAIN'S BRIDGE</h2>
       <p class="section-subtitle">Take control of the bridge instruments in this interactive web deck. Practice steering and monitor the radar scan!</p>
       <div class="section-line"></div>
     </div>
 
-    <!-- HUD Theme Selector palette -->
+    <!-- HUD Theme Selector palette & Environmental Environment Overrides -->
     <div class="hud-palette-selector">
-      <span class="palette-label">HUD PALETTE THEME:</span>
-      <div class="palette-colors">
-        <button class="palette-btn color-cyan active" data-theme="cyan" title="Cyber Cyan"></button>
-        <button class="palette-btn color-amber" data-theme="amber" title="Vintage Amber"></button>
-        <button class="palette-btn color-red" data-theme="red" title="Crimson Warning"></button>
-        <button class="palette-btn color-ocean" data-theme="ocean" title="Deep Blue Sea"></button>
+      <div class="palette-subgroup">
+        <span class="palette-label">HUD PALETTE:</span>
+        <div class="palette-colors">
+          <button class="palette-btn color-cyan active" data-theme="cyan" title="Cyber Cyan"></button>
+          <button class="palette-btn color-amber" data-theme="amber" title="Vintage Amber"></button>
+          <button class="palette-btn color-red" data-theme="red" title="Crimson Warning"></button>
+          <button class="palette-btn color-ocean" data-theme="ocean" title="Deep Blue Sea"></button>
+        </div>
+      </div>
+
+      <div class="palette-subgroup">
+        <span class="palette-label">TIME & WEATHER:</span>
+        <div class="env-mode-selectors">
+          <button class="env-mode-btn active" data-env="daylight" title="Daylight Mode"><i class="fa-solid fa-sun"></i> DAY</button>
+          <button class="env-mode-btn" data-env="sunset" title="Sunset Mode"><i class="fa-solid fa-cloud-sun"></i> SUNSET</button>
+          <button class="env-mode-btn" data-env="night" title="Night Mode"><i class="fa-solid fa-moon"></i> NIGHT</button>
+          <button class="env-mode-btn" data-env="storm" title="Heavy Storm Mode"><i class="fa-solid fa-cloud-showers-water"></i> STORM</button>
+        </div>
       </div>
     </div>
 
@@ -457,6 +472,21 @@
               <span class="tele-val value-alert" id="teleAlert">CLEAR</span>
             </div>
           </div>
+
+          <!-- Vessel Damage & Hull Health Indicator -->
+          <div class="hull-health-container">
+            <div class="hull-health-header">
+              <span>HULL INTEGRITY</span>
+              <span id="hullHealthText">100%</span>
+            </div>
+            <div class="hull-health-bar-wrapper">
+              <div class="hull-health-bar" id="hullHealthBar" style="width: 100%;"></div>
+            </div>
+            <button class="repair-btn" id="repairBtn" style="display: none;">
+              <i class="fa-solid fa-wrench"></i> INITIATE HULL REPAIRS
+            </button>
+          </div>
+
           <!-- Audio control for horn synthesizing & emergency alarm -->
           <div class="horn-control">
             <button class="horn-btn" id="hornBtn">
@@ -472,6 +502,22 @@
               <input type="file" id="alarmUploader" accept="audio/*" style="display: none;">
             </div>
             <div class="horn-tooltip" id="alarmStatusTooltip">Uses local audio with dynamic synthesis fallback</div>
+          </div>
+        </div>
+
+        <!-- Voyage Logbook / Arrival Ledger panel -->
+        <div class="voyage-ledger-panel">
+          <div class="ledger-header">
+            <span><i class="fa-solid fa-book-maritime"></i> CAPTAIN'S VOYAGE LEDGER</span>
+            <button class="ledger-log-btn" id="manualLogBtn" title="Log Current Position">
+              <i class="fa-solid fa-pen-nib"></i> LOG POSITION
+            </button>
+          </div>
+          <div class="ledger-body">
+            <div class="ledger-entries-container" id="ledgerEntries">
+              <!-- Dynamically populated entries -->
+              <div class="ledger-placeholder">No voyage entries recorded. Sail or click "LOG POSITION" to append telemetry logs.</div>
+            </div>
           </div>
         </div>
       </div>
