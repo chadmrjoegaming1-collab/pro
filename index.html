@@ -336,12 +336,15 @@
               <span class="tele-val value-alert" id="teleAlert">CLEAR</span>
             </div>
           </div>
-          <!-- Audio control for horn synthesizing -->
+          <!-- Audio control for horn synthesizing & emergency alarm -->
           <div class="horn-control">
             <button class="horn-btn" id="hornBtn">
               <i class="fa-solid fa-volume-high"></i> SOUND SHIP'S HORN
             </button>
-            <div class="horn-tooltip">Uses synthesized audio waves</div>
+            <button class="alarm-btn" id="alarmBtn">
+              <i class="fa-solid fa-bell"></i> TURN ON EVAC ALARM
+            </button>
+            <div class="horn-tooltip">Uses local audio with dynamic synthesis fallback</div>
           </div>
         </div>
       </div>

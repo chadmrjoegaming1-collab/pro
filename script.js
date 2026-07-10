@@ -620,6 +620,126 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // --- COCKPIT/EMERGENCY ALARM CONTROLLER ---
+  const alarmBtn = document.getElementById('alarmBtn');
+  const simulatorSection = document.getElementById('simulator');
+  let alarmAudio = null;
+  let isAlarmPlaying = false;
+  let synthAlarmInterval = null;
+
+  // Synthesize standard cruise ship emergency alarm sound (7 short and 1 long blast)
+  const playSynthesizedEmergencyAlarm = () => {
+    try {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+
+      let blastCount = 0;
+
+      const fireBlast = (duration) => {
+        if (!isAlarmPlaying) return;
+        const gainNode = audioCtx.createGain();
+        const osc1 = audioCtx.createOscillator();
+        const osc2 = audioCtx.createOscillator();
+
+        osc1.type = 'sawtooth';
+        osc1.frequency.setValueAtTime(440, audioCtx.currentTime); // Pitch A4
+        osc2.type = 'square';
+        osc2.frequency.setValueAtTime(444, audioCtx.currentTime); // Detuned peak for discordant alarm vibe
+
+        gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.4, audioCtx.currentTime + 0.05);
+        gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime + duration - 0.05);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(600, audioCtx.currentTime);
+
+        osc1.connect(filter);
+        osc2.connect(filter);
+        filter.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        osc1.start();
+        osc2.start();
+        osc1.stop(audioCtx.currentTime + duration);
+        osc2.stop(audioCtx.currentTime + duration);
+      };
+
+      const tickAlarm = () => {
+        if (!isAlarmPlaying) return;
+        if (blastCount < 7) {
+          // Play a short blast (300ms)
+          fireBlast(0.30);
+          blastCount++;
+          synthAlarmInterval = setTimeout(tickAlarm, 600); // Wait 600ms between short blasts
+        } else {
+          // Play 1 long blast (2.0s)
+          fireBlast(2.0);
+          blastCount = 0;
+          synthAlarmInterval = setTimeout(tickAlarm, 3000); // Wait 3.0s after long blast to loop
+        }
+      };
+
+      tickAlarm();
+
+    } catch (err) {
+      console.warn("Synth warning:", err);
+    }
+  };
+
+  alarmBtn.addEventListener('click', () => {
+    isAlarmPlaying = !isAlarmPlaying;
+
+    if (isAlarmPlaying) {
+      alarmBtn.classList.add('active');
+      alarmBtn.innerHTML = `<i class="fa-solid fa-bell-slash"></i> TURN OFF ALARM`;
+      simulatorSection.classList.add('red-alert-active');
+      teleAlert.textContent = "GENERAL EMERGENCY ALARM";
+      teleAlert.className = "tele-val value-alert";
+
+      // Attempt to load and play user's local absolute Windows file path
+      const filePath = "C:\\Users\\stude\\Music\\MP3Skull\\Cruise Ship Emergency Alarm, Evacuation Lifejacket Instructions & Prohibitions (Carnival Cruise).mp3";
+
+      if (!alarmAudio) {
+        alarmAudio = new Audio(filePath);
+        alarmAudio.loop = true;
+      }
+
+      alarmAudio.play()
+        .then(() => {
+          console.log("Local audio played successfully.");
+        })
+        .catch(err => {
+          console.warn("Local absolute file access is blocked by browser security sandbox policies. Falling back to dynamic procedural Web Audio synthesis...", err);
+          // Launch synthesis engine
+          playSynthesizedEmergencyAlarm();
+        });
+
+    } else {
+      alarmBtn.classList.remove('active');
+      alarmBtn.innerHTML = `<i class="fa-solid fa-bell"></i> TURN ON EVAC ALARM`;
+      simulatorSection.classList.remove('red-alert-active');
+      teleAlert.textContent = "CLEAR / NORMAL";
+      teleAlert.className = "tele-val value-green";
+
+      // Stop Audio if playing
+      if (alarmAudio) {
+        alarmAudio.pause();
+        alarmAudio.currentTime = 0;
+      }
+
+      // Stop Synth looping
+      if (synthAlarmInterval) {
+        clearTimeout(synthAlarmInterval);
+        synthAlarmInterval = null;
+      }
+    }
+  });
 
   // --- FAQ ACCORDION INTERACTIVITY ---
   const faqToggles = document.querySelectorAll('.faq-toggle');
