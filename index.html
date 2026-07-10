@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cruise Ship Simulator | Tableboard Studios</title>
+  <!-- FontAwesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;800&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- NAVIGATION BAR -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="#" class="logo">
+        <i class="fa-solid fa-ship logo-icon"></i>
+        <span class="logo-text">TABLEBOARD <span class="accent-text">STUDIOS</span></span>
+      </a>
+      <nav class="nav-menu" id="navMenu">
+        <a href="#hero" class="nav-link active">Home</a>
+        <a href="#fleet" class="nav-link">Fleet</a>
+        <a href="#destinations" class="nav-link">Destinations</a>
+        <a href="#simulator" class="nav-link">Captain's Bridge</a>
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#faq" class="nav-link">FAQ</a>
+        <a href="https://www.roblox.com/games/17234598656/Cruise-Ship-Simulator" target="_blank" class="nav-btn play-btn-nav">PLAY NOW <i class="fa-solid fa-circle-play"></i></a>
+      </nav>
+      <div class="hamburger" id="hamburgerBtn">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section id="hero" class="hero-section">
+    <div class="ocean-bg">
+      <div class="wave wave1"></div>
+      <div class="wave wave2"></div>
+      <div class="wave wave3"></div>
+      <div class="wave wave4"></div>
+    </div>
+
+    <!-- Floating particles/stars in the background -->
+    <div class="stars"></div>
+
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        <span class="badge-text">CRUISE SHIP SIMULATOR [BETA]</span>
+      </div>
+      <h1 class="hero-title">COMMAND THE OCEAN'S <br><span class="highlight-text">GREATEST GIANTS</span></h1>
+      <p class="hero-subtitle">
+        Set sail from stunning ports across the Mediterranean or Bahamas. Earn cash, unlock massive cruise ships, refuel at sea, and rise to the rank of Elite Captain in the ultimate maritime simulator on Roblox.
+      </p>
+      <div class="hero-actions">
+        <a href="https://www.roblox.com/games/17234598656/Cruise-Ship-Simulator" target="_blank" class="cta-btn primary-cta">
+          <span class="btn-glow"></span>
+          <i class="fa-solid fa-play"></i> Launch Simulator
+        </a>
+        <a href="#simulator" class="cta-btn secondary-cta">
+          <i class="fa-solid fa-compass"></i> Enter Bridge Mini-Game
+        </a>
+      </div>
+
+      <!-- Live Stats Ticker -->
+      <div class="hero-stats">
+        <div class="stat-box">
+          <span class="stat-number" data-target="45000">0</span><span class="stat-suffix">+</span>
+          <span class="stat-label">Active Members</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-box">
+          <span class="stat-number" data-target="15">0</span><span class="stat-suffix">+</span>
+          <span class="stat-label">Unlockable Ships</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-box">
+          <span class="stat-number" data-target="92">0</span><span class="stat-suffix">%</span>
+          <span class="stat-label">Rating</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Floating Cruise Ship Graphic in Hero -->
+    <div class="hero-ship-container">
+      <img src="https://images.unsplash.com/photo-1548543604-a87c9909abec?q=80&w=600&auto=format&fit=crop" alt="Cruise Ship" class="hero-ship-img">
+      <div class="ship-spray"></div>
+    </div>
+  </section>
+
+  <!-- FLEET SHOWCASE SECTION -->
+  <section id="fleet" class="fleet-section">
+    <div class="section-header">
+      <h2 class="section-title">THE TABLEBOARD FLEET</h2>
+      <p class="section-subtitle">From compact tugboats to monumental floating cities, command vessels meticulously modeled with realistic physics.</p>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="fleet-container">
+      <!-- Tabs for Ship selection -->
+      <div class="fleet-tabs">
+        <button class="fleet-tab active" data-ship="allegra">
+          <i class="fa-solid fa-anchor"></i> Allegra Class
+        </button>
+        <button class="fleet-tab" data-ship="vista">
+          <i class="fa-solid fa-ship"></i> Vista Class
+        </button>
+        <button class="fleet-tab" data-ship="oasis">
+          <i class="fa-solid fa-hotel"></i> Oasis Class
+        </button>
+        <button class="fleet-tab" data-ship="specialty">
+          <i class="fa-solid fa-truck-monster"></i> Specialty Fleet
+        </button>
+      </div>
+
+      <!-- Ship Info Card (Dynamic Content via JS) -->
+      <div class="ship-card" id="shipCard">
+        <div class="ship-card-left">
+          <div class="ship-img-container">
+            <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=800&auto=format&fit=crop" alt="Ship Class" id="shipImage" class="ship-image">
+            <div class="ship-class-badge" id="shipClassBadge">ENTRY CLASS</div>
+          </div>
+        </div>
+        <div class="ship-card-right">
+          <h3 class="ship-name" id="shipName">The Allegra Class</h3>
+          <p class="ship-desc" id="shipDesc">The perfect vessel for starting Captains. Compact, nimble, and highly maneuverable, the Allegra Class lets you learn the ropes of docking and navigating narrow ports with ease.</p>
+
+          <div class="ship-stats-grid">
+            <div class="ship-stat">
+              <span class="ship-stat-label">Length</span>
+              <div class="stat-bar-container">
+                <div class="stat-bar" id="statLength" style="width: 35%;"></div>
+              </div>
+              <span class="ship-stat-value" id="valLength">180m</span>
+            </div>
+
+            <div class="ship-stat">
+              <span class="ship-stat-label">Passenger Capacity</span>
+              <div class="stat-bar-container">
+                <div class="stat-bar" id="statCapacity" style="width: 25%;"></div>
+              </div>
+              <span class="ship-stat-value" id="valCapacity">1,200</span>
+            </div>
+
+            <div class="ship-stat">
+              <span class="ship-stat-label">Max Speed</span>
+              <div class="stat-bar-container">
+                <div class="stat-bar" id="statSpeed" style="width: 60%;"></div>
+              </div>
+              <span class="ship-stat-value" id="valSpeed">21 knots</span>
+            </div>
+
+            <div class="ship-stat">
+              <span class="ship-stat-label">Handling Difficulty</span>
+              <div class="stat-bar-container">
+                <div class="stat-bar" id="statDifficulty" style="width: 20%;"></div>
+              </div>
+              <span class="ship-stat-value" id="valDifficulty">Easy</span>
+            </div>
+          </div>
+
+          <div class="ship-features-list">
+            <h4>Vessel Features:</h4>
+            <ul id="shipFeatures">
+              <li><i class="fa-solid fa-circle-check"></i> Highly responsive twin rudders</li>
+              <li><i class="fa-solid fa-circle-check"></i> Great for shallow water harbor entry</li>
+              <li><i class="fa-solid fa-circle-check"></i> Optimized fuel consumption</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INTERACTIVE ROUTE MAP SECTION -->
+  <section id="destinations" class="destinations-section">
+    <div class="section-header">
+      <h2 class="section-title">CHART YOUR COURSE</h2>
+      <p class="section-subtitle">Sail beautiful waters across the globe. Click on any port to view route details, rewards, and difficulty.</p>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="map-grid">
+      <!-- Interactive SVG Map / Diagram Panel -->
+      <div class="map-wrapper">
+        <div class="map-visual">
+          <div class="sea-grid"></div>
+
+          <!-- Port Markers -->
+          <div class="map-marker active" style="top: 25%; left: 15%;" data-port="barcelona">
+            <span class="pulse"></span>
+            <span class="marker-dot"><i class="fa-solid fa-anchor"></i></span>
+            <span class="marker-name">Barcelona Port</span>
+          </div>
+
+          <div class="map-marker" style="top: 50%; left: 45%;" data-port="santorini">
+            <span class="pulse"></span>
+            <span class="marker-dot"><i class="fa-solid fa-anchor"></i></span>
+            <span class="marker-name">Santorini Caldera</span>
+          </div>
+
+          <div class="map-marker" style="top: 15%; left: 75%;" data-port="venice">
+            <span class="pulse"></span>
+            <span class="marker-dot"><i class="fa-solid fa-anchor"></i></span>
+            <span class="marker-name">Venice Canals</span>
+          </div>
+
+          <div class="map-marker" style="top: 75%; left: 25%;" data-port="nassau">
+            <span class="pulse"></span>
+            <span class="marker-dot"><i class="fa-solid fa-anchor"></i></span>
+            <span class="marker-name">Nassau Harbour</span>
+          </div>
+
+          <div class="map-marker" style="top: 80%; left: 80%;" data-port="cococay">
+            <span class="pulse"></span>
+            <span class="marker-dot"><i class="fa-solid fa-anchor"></i></span>
+            <span class="marker-name">CocoCay Island</span>
+          </div>
+
+          <!-- Compass Rose Graphic -->
+          <div class="compass-rose">
+            <div class="compass-dial">
+              <span class="direction n">N</span>
+              <span class="direction e">E</span>
+              <span class="direction s">S</span>
+              <span class="direction w">W</span>
+              <div class="compass-needle"></div>
+            </div>
+          </div>
+
+          <!-- Connecting Sea Routes (SVG overlay) -->
+          <svg class="routes-overlay" width="100%" height="100%">
+            <!-- Barcelona to Santorini -->
+            <path d="M 100 120 Q 200 180 300 240" fill="none" stroke="rgba(0, 242, 254, 0.4)" stroke-width="2" stroke-dasharray="5,5" class="route-line"></path>
+            <!-- Venice to Santorini -->
+            <path d="M 500 72 Q 400 150 300 240" fill="none" stroke="rgba(0, 242, 254, 0.4)" stroke-width="2" stroke-dasharray="5,5" class="route-line"></path>
+            <!-- Nassau to CocoCay -->
+            <path d="M 166 360 Q 350 370 533 384" fill="none" stroke="rgba(0, 242, 254, 0.4)" stroke-width="2" stroke-dasharray="5,5" class="route-line"></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Destination Detail Card -->
+      <div class="port-detail-card" id="portDetailCard">
+        <div class="port-detail-header">
+          <span class="region-tag" id="portRegion">MEDITERRANEAN</span>
+          <h3 id="portName">Barcelona Port</h3>
+        </div>
+        <div class="port-detail-body">
+          <p id="portDesc">The cultural capital of Catalonia. Offers tight dockings alongside the world's most luxurious mega-yachts. Navigating the outer wall requires careful speed management.</p>
+          <hr class="port-divider">
+          <div class="port-specs">
+            <div class="port-spec-item">
+              <i class="fa-solid fa-coins spec-icon"></i>
+              <div>
+                <span class="spec-label">Cash Reward</span>
+                <span class="spec-val" id="portReward">$2,500</span>
+              </div>
+            </div>
+            <div class="port-spec-item">
+              <i class="fa-solid fa-gauge-high spec-icon"></i>
+              <div>
+                <span class="spec-label">Navigation Difficulty</span>
+                <span class="spec-val" id="portDifficulty">Moderate</span>
+              </div>
+            </div>
+            <div class="port-spec-item">
+              <i class="fa-solid fa-ship spec-icon"></i>
+              <div>
+                <span class="spec-label">Recom. Vessel Size</span>
+                <span class="spec-val" id="portSize">All Classes</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="port-detail-footer">
+          <a href="https://www.roblox.com/games/17234598656/Cruise-Ship-Simulator" target="_blank" class="sail-now-btn">
+            Sail This Route <i class="fa-solid fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CAPTAIN'S BRIDGE MINI-SIMULATOR -->
+  <section id="simulator" class="simulator-section">
+    <div class="section-header">
+      <h2 class="section-title">THE CAPTAIN'S BRIDGE</h2>
+      <p class="section-subtitle">Take control of the bridge instruments in this interactive web deck. Practice steering and monitor the radar scan!</p>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="simulator-layout">
+      <!-- Instrument Console Screen -->
+      <div class="console-screen">
+        <div class="radar-hud">
+          <div class="radar-sweep"></div>
+          <div class="radar-grid"></div>
+          <canvas id="radarCanvas" width="300" height="300"></canvas>
+          <div class="hud-status">RADAR ACTIVE</div>
+        </div>
+
+        <div class="telemetry-panel">
+          <div class="telemetry-header">BRIDGE TELEMETRY</div>
+          <div class="telemetry-grid">
+            <div class="tele-item">
+              <span class="tele-label">HEADING</span>
+              <span class="tele-val value-orange" id="teleHeading">000°</span>
+            </div>
+            <div class="tele-item">
+              <span class="tele-label">SPEED</span>
+              <span class="tele-val value-green" id="teleSpeed">0.0 KTS</span>
+            </div>
+            <div class="tele-item">
+              <span class="tele-label">DEPTH</span>
+              <span class="tele-val value-blue" id="teleDepth">124.5 M</span>
+            </div>
+            <div class="tele-item">
+              <span class="tele-label">RUDDER</span>
+              <span class="tele-val value-yellow" id="teleRudder">0° MID</span>
+            </div>
+            <div class="tele-item">
+              <span class="tele-label">THRUST</span>
+              <span class="tele-val" id="teleThrust">0%</span>
+            </div>
+            <div class="tele-item">
+              <span class="tele-label">ALERTS</span>
+              <span class="tele-val value-alert" id="teleAlert">CLEAR</span>
+            </div>
+          </div>
+          <!-- Audio control for horn synthesizing -->
+          <div class="horn-control">
+            <button class="horn-btn" id="hornBtn">
+              <i class="fa-solid fa-volume-high"></i> SOUND SHIP'S HORN
+            </button>
+            <div class="horn-tooltip">Uses synthesized audio waves</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls Panel (Interactive Elements) -->
+      <div class="console-controls">
+        <div class="control-card">
+          <h4>Steering Wheel</h4>
+          <p class="control-help">Click & drag, or use arrows to steer the cruise ship left or right.</p>
+          <div class="wheel-outer">
+            <div class="steering-wheel" id="steeringWheel">
+              <div class="wheel-center"></div>
+              <div class="wheel-spoke spoke-1"></div>
+              <div class="wheel-spoke spoke-2"></div>
+              <div class="wheel-spoke spoke-3"></div>
+              <div class="wheel-spoke spoke-4"></div>
+              <div class="wheel-spoke spoke-5"></div>
+              <div class="wheel-spoke spoke-6"></div>
+            </div>
+          </div>
+          <div class="rudder-actions">
+            <button class="steer-btn" id="steerLeft"><i class="fa-solid fa-rotate-left"></i> Port</button>
+            <button class="steer-btn" id="steerCenter">Center</button>
+            <button class="steer-btn" id="steerRight">Starboard <i class="fa-solid fa-rotate-right"></i></button>
+          </div>
+        </div>
+
+        <div class="control-card">
+          <h4>Engine Order Telegraph</h4>
+          <p class="control-help">Adjust the slider to command engine speed and generate headway.</p>
+          <div class="telegraph-wrapper">
+            <div class="telegraph-labels">
+              <span>FLANK</span>
+              <span>FULL</span>
+              <span>HALF</span>
+              <span>SLOW</span>
+              <span>STOP</span>
+            </div>
+            <input type="range" min="0" max="100" value="0" class="thrust-slider" id="thrustSlider" orient="vertical">
+          </div>
+          <div class="slider-val-readout">
+            Thrust Order: <span id="thrustSliderReadout">0%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GAME FEATURES -->
+  <section id="features" class="features-section">
+    <div class="section-header">
+      <h2 class="section-title">SIMULATOR FEATURES</h2>
+      <p class="section-subtitle">Tableboard Studios is dedicated to premium, deeply immersive experiences on Roblox.</p>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon-wrapper">
+          <i class="fa-solid fa-wind"></i>
+        </div>
+        <h3>Dynamic Environmental Physics</h3>
+        <p>Experience realistic ocean currents, high winds, and heavy swells that dynamically impact vessel maneuverability and braking distances.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon-wrapper">
+          <i class="fa-solid fa-compass-drafting"></i>
+        </div>
+        <h3>High-Fidelity Marine Models</h3>
+        <p>Every class of vessel, from passenger liners to deep-sea tugs, features meticulously designed bridges, custom instrument layouts, and visual details.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon-wrapper">
+          <i class="fa-solid fa-handshake"></i>
+        </div>
+        <h3>Interactive Careers & MP</h3>
+        <p>Coordinate with friends! Hire harbor tugs to tow your hull, refuel with specialized LNG carriers, or lead convoy formations through international lanes.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon-wrapper">
+          <i class="fa-solid fa-cloud-sun-rain"></i>
+        </div>
+        <h3>Day/Night & Weather Cycle</h3>
+        <p>Navigate heavy rainstorms, foggy channels, and beautiful sunsets with full navigational lights and fog horns at your disposal.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ SECTION -->
+  <section id="faq" class="faq-section">
+    <div class="section-header">
+      <h2 class="section-title">FREQUENTLY ASKED QUESTIONS</h2>
+      <p class="section-subtitle">Everything you need to know about Cruise Ship Simulator by Tableboard Studios.</p>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="faq-container">
+      <div class="faq-item">
+        <button class="faq-toggle">
+          <span>How do I unlock bigger cruise ships?</span>
+          <i class="fa-solid fa-chevron-down faq-icon"></i>
+        </button>
+        <div class="faq-content">
+          <p>You earn cash by successfully piloting your current cruise ship to various destinations. Once you acquire enough cash, visit the Shipyard in any major port to purchase larger, more majestic vessels like the Vista or Oasis classes.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-toggle">
+          <span>What role do specialty vessels play in the simulator?</span>
+          <i class="fa-solid fa-chevron-down faq-icon"></i>
+        </button>
+        <div class="faq-content">
+          <p>Specialty vessels add cooperative gameplay elements! Tugboats can tow larger cruise ships out of tight berths, while LNG (Liquid Natural Gas) carriers can dock next to other vessels at sea to refuel them, earning both players extra rewards.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-toggle">
+          <span>Is Cruise Ship Simulator free to play?</span>
+          <i class="fa-solid fa-chevron-down faq-icon"></i>
+        </button>
+        <div class="faq-content">
+          <p>Yes, Cruise Ship Simulator is completely free to play on Roblox! Some optional in-game gamepasses and cosmetics are available for purchase using Robux to support Tableboard Studios' continuous development.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-toggle">
+          <span>How can I join the community and report bugs?</span>
+          <i class="fa-solid fa-chevron-down faq-icon"></i>
+        </button>
+        <div class="faq-content">
+          <p>You can join the official Tableboard Studios Roblox Group and follow our communication server links found in the description of the game. Our community regularly hosts special sailing events and coordinates beta testing!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOCIALS & NEWSLETTER -->
+  <section class="socials-section">
+    <div class="socials-container">
+      <h2>JOIN THE CAPTAINS' CIRCLE</h2>
+      <p>Connect with over 40,000 maritime enthusiasts, participate in group voyages, and get sneak-peeks of the 2026 maritime projects.</p>
+
+      <div class="social-links">
+        <a href="https://www.roblox.com/communities/4795028/Tableboard-Studios#!/about" target="_blank" class="social-btn group-link">
+          <i class="fa-solid fa-users"></i> Roblox Group
+        </a>
+        <a href="https://discord.com/servers/tableboard-studios-555213279589564446" target="_blank" class="social-btn discord-link">
+          <i class="fa-brands fa-discord"></i> Discord Community
+        </a>
+        <a href="https://www.roblox.com/games/17234598656/Cruise-Ship-Simulator" target="_blank" class="social-btn play-link">
+          <i class="fa-solid fa-gamepad"></i> Play on Roblox
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-container">
+      <div class="footer-brand">
+        <div class="logo">
+          <i class="fa-solid fa-ship logo-icon"></i>
+          <span class="logo-text">TABLEBOARD <span class="accent-text">STUDIOS</span></span>
+        </div>
+        <p>Crafting high-quality, unforgettable maritime experiences on Roblox since 2019.</p>
+      </div>
+
+      <div class="footer-links">
+        <h4>Navigation</h4>
+        <a href="#hero">Home</a>
+        <a href="#fleet">Fleet</a>
+        <a href="#destinations">Destinations</a>
+        <a href="#simulator">Captain's Bridge</a>
+      </div>
+
+      <div class="footer-links">
+        <h4>Game Links</h4>
+        <a href="https://www.roblox.com/games/17234598656/Cruise-Ship-Simulator" target="_blank">Cruise Ship Simulator [BETA]</a>
+        <a href="https://www.roblox.com/communities/4795028/Tableboard-Studios" target="_blank">Roblox Group Page</a>
+        <a href="https://discord.com/servers/tableboard-studios-555213279589564446" target="_blank">Discord Server</a>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; 2025 Tableboard Studios. All Rights Reserved. Not officially affiliated with Roblox Corporation.</p>
+    </div>
+  </footer>
+
+  <!-- Custom JavaScript File -->
+  <script src="script.js"></script>
+</body>
+</html>
