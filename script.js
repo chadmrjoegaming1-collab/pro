@@ -760,12 +760,15 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         const fileUrl = URL.createObjectURL(file);
 
-        // Stop current alarm playback if any exists
-        if (alarmAudio) {
+        // 1. If currently playing, toggle off to perform full teardown of oscillators and existing playbacks
+        if (isAlarmPlaying) {
+          alarmBtn.click();
+        } else if (alarmAudio) {
+          // If not playing but alarmAudio exists, perform a safe pause
           alarmAudio.pause();
         }
 
-        // Initialize new Audio with user file blob url
+        // 2. Initialize new Audio with user file blob url
         alarmAudio = new Audio(fileUrl);
         alarmAudio.loop = true;
         hasUploadedAudio = true;
@@ -777,12 +780,8 @@ document.addEventListener('DOMContentLoaded', () => {
         uploadBtn.style.borderColor = "var(--color-accent-green)";
         uploadBtn.style.color = "var(--color-accent-green)";
 
-        // Reset alarm trigger if currently playing to switch tracks seamlessly
-        if (isAlarmPlaying) {
-          // Temporarily toggle state to false, run off logic, and toggle back on
-          isAlarmPlaying = false;
-          alarmBtn.click();
-        }
+        // 3. Reactivate alarm instantly with the newly loaded track
+        alarmBtn.click();
 
       } catch (err) {
         console.error("Failed to load uploaded file", err);
