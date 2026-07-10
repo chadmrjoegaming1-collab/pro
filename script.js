@@ -627,6 +627,10 @@ document.addEventListener('DOMContentLoaded', () => {
   let isAlarmPlaying = false;
   let synthAlarmInterval = null;
 
+  // Track active synthesized nodes to force terminate them immediately when turning off the alarm
+  let activeSynthOscillators = [];
+  let activeSynthGains = [];
+
   // Synthesize standard cruise ship emergency alarm sound (7 short and 1 long blast)
   const playSynthesizedEmergencyAlarm = () => {
     try {
@@ -666,8 +670,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         osc1.start();
         osc2.start();
+
+        // Save references so we can stop them instantly if the user clicks "TURN OFF ALARM"
+        activeSynthOscillators.push(osc1, osc2);
+        activeSynthGains.push(gainNode);
+
+        // Schedule normal stop
         osc1.stop(audioCtx.currentTime + duration);
         osc2.stop(audioCtx.currentTime + duration);
+
+        // Cleanup references after playback completes
+        setTimeout(() => {
+          activeSynthOscillators = activeSynthOscillators.filter(o => o !== osc1 && o !== osc2);
+          activeSynthGains = activeSynthGains.filter(g => g !== gainNode);
+        }, duration * 1000 + 100);
       };
 
       const tickAlarm = () => {
@@ -727,17 +743,34 @@ document.addEventListener('DOMContentLoaded', () => {
       teleAlert.textContent = "CLEAR / NORMAL";
       teleAlert.className = "tele-val value-green";
 
-      // Stop Audio if playing
+      // 1. Stop local absolute Audio if playing
       if (alarmAudio) {
         alarmAudio.pause();
         alarmAudio.currentTime = 0;
       }
 
-      // Stop Synth looping
+      // 2. Stop scheduled Synth timeouts
       if (synthAlarmInterval) {
         clearTimeout(synthAlarmInterval);
         synthAlarmInterval = null;
       }
+
+      // 3. Immediately silence and stop all currently active synthesized sound blasts
+      activeSynthGains.forEach(gainNode => {
+        try {
+          gainNode.gain.cancelScheduledValues(audioCtx.currentTime);
+          gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+        } catch(e){}
+      });
+      activeSynthOscillators.forEach(osc => {
+        try {
+          osc.stop();
+        } catch(e){}
+      });
+
+      // Clear arrays
+      activeSynthOscillators = [];
+      activeSynthGains = [];
     }
   });
 
