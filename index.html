@@ -26,6 +26,7 @@
         <a href="#hero" class="nav-link active">Home</a>
         <a href="#fleet" class="nav-link">Fleet</a>
         <a href="#destinations" class="nav-link">Destinations</a>
+        <a href="#deck-explorer" class="nav-link">Deck Explorer</a>
         <a href="#simulator" class="nav-link">Captain's Bridge</a>
         <a href="#features" class="nav-link">Features</a>
         <a href="#faq" class="nav-link">FAQ</a>
@@ -58,7 +59,7 @@
       </div>
       <h1 class="hero-title">COMMAND THE OCEAN'S <br><span class="highlight-text">GREATEST GIANTS</span></h1>
       <p class="hero-subtitle">
-        Set sail from stunning ports across the Mediterranean or Bahamas. Earn cash, unlock massive cruise ships, refuel at sea, and rise to the rank of Elite Captain in the ultimate maritime simulato[...]
+        Set sail from stunning ports across the Mediterranean or Bahamas. Earn cash, unlock massive cruise ships, refuel at sea, and rise to the rank of Elite Captain in the ultimate maritime simulator on Roblox.
       </p>
       <div class="hero-actions">
         <a href="https://www.roblox.com/games/17234598656/Cruise-Ship-Simulator" target="_blank" class="cta-btn primary-cta">
@@ -131,7 +132,7 @@
         </div>
         <div class="ship-card-right">
           <h3 class="ship-name" id="shipName">The Allegra Class</h3>
-          <p class="ship-desc" id="shipDesc">The perfect vessel for starting Captains. Compact, nimble, and highly maneuverable, the Allegra Class lets you learn the ropes of docking and navigating na[...]
+          <p class="ship-desc" id="shipDesc">The perfect vessel for starting Captains. Compact, nimble, and highly maneuverable, the Allegra Class lets you learn the ropes of docking and navigating narrow ports with ease.</p>
 
           <div class="ship-stats-grid">
             <div class="ship-stat">
@@ -290,12 +291,132 @@
     </div>
   </section>
 
+  <!-- INTERACTIVE SHIP DECK EXPLORER SECTION -->
+  <section id="deck-explorer" class="deck-explorer-section">
+    <div class="section-header">
+      <h2 class="section-title">SHIP DECK EXPLORER</h2>
+      <p class="section-subtitle">Examine the high-fidelity interior layouts of our flagship mega-liners. Select a deck level below to survey coordinates and compartment designs.</p>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="deck-explorer-container">
+      <!-- Deck Selector Buttons -->
+      <div class="deck-selector-aside">
+        <button class="deck-btn active" data-deck="deck-bridge">
+          <span class="deck-num">DECK 12</span>
+          <span class="deck-lbl">Captain's Bridge</span>
+        </button>
+        <button class="deck-btn" data-deck="deck-lido">
+          <span class="deck-num">DECK 10</span>
+          <span class="deck-lbl">Lido Pool & Dining</span>
+        </button>
+        <button class="deck-btn" data-deck="deck-promenade">
+          <span class="deck-num">DECK 05</span>
+          <span class="deck-lbl">Royal Promenade</span>
+        </button>
+        <button class="deck-btn" data-deck="deck-engine">
+          <span class="deck-num">DECK 01</span>
+          <span class="deck-lbl">Engine Control Room</span>
+        </button>
+      </div>
+
+      <!-- Deck Visual blueprint & description -->
+      <div class="deck-viewer-main">
+        <div class="deck-blueprint-card">
+          <div class="blueprint-canvas-wrapper">
+            <div class="blueprint-grid"></div>
+            <!-- Dynamic blueprint overlays -->
+            <div class="blueprint-graphic active" id="blueprintBridge">
+              <div class="blueprint-hotspot hotspot-1" data-spot="Primary Helm Controls" style="top: 25%; left: 50%;"><i class="fa-solid fa-crosshairs"></i></div>
+              <div class="blueprint-hotspot hotspot-2" data-spot="Navigator's Plotting Table" style="top: 50%; left: 30%;"><i class="fa-solid fa-crosshairs"></i></div>
+              <div class="blueprint-hotspot hotspot-3" data-spot="Communications Console" style="top: 45%; left: 70%;"><i class="fa-solid fa-crosshairs"></i></div>
+              <svg class="blueprint-vector" viewBox="0 0 400 200">
+                <rect x="50" y="30" width="300" height="140" rx="10" fill="none" stroke="rgba(0, 242, 254, 0.4)" stroke-width="2" stroke-dasharray="4,4"></rect>
+                <line x1="200" y1="30" x2="200" y2="170" stroke="rgba(0, 242, 254, 0.2)" stroke-width="1"></line>
+                <circle cx="200" cy="100" r="30" fill="none" stroke="rgba(0, 242, 254, 0.4)" stroke-width="2"></circle>
+                <path d="M 120 70 L 280 70 M 120 130 L 280 130" stroke="rgba(0, 242, 254, 0.3)" stroke-width="2"></path>
+              </svg>
+            </div>
+
+            <div class="blueprint-graphic" id="blueprintLido">
+              <div class="blueprint-hotspot hotspot-1" data-spot="Infinity Edge Wave Pool" style="top: 35%; left: 45%;"><i class="fa-solid fa-crosshairs"></i></div>
+              <div class="blueprint-hotspot hotspot-2" data-spot="Solarium Glass Buffet" style="top: 65%; left: 20%;"><i class="fa-solid fa-crosshairs"></i></div>
+              <div class="blueprint-hotspot hotspot-3" data-spot="Premium Water-Slides" style="top: 20%; left: 80%;"><i class="fa-solid fa-crosshairs"></i></div>
+              <svg class="blueprint-vector" viewBox="0 0 400 200">
+                <rect x="30" y="40" width="340" height="120" rx="40" fill="none" stroke="rgba(0, 242, 254, 0.4)" stroke-width="2" stroke-dasharray="4,4"></rect>
+                <ellipse cx="200" cy="100" rx="80" ry="30" fill="none" stroke="rgba(0, 242, 254, 0.3)" stroke-width="2"></ellipse>
+              </svg>
+            </div>
+
+            <div class="blueprint-graphic" id="blueprintPromenade">
+              <div class="blueprint-hotspot hotspot-1" data-spot="The Grand Atrium Lounge" style="top: 50%; left: 50%;"><i class="fa-solid fa-crosshairs"></i></div>
+              <div class="blueprint-hotspot hotspot-2" data-spot="Duty-Free Luxury Shops" style="top: 30%; left: 25%;"><i class="fa-solid fa-crosshairs"></i></div>
+              <div class="blueprint-hotspot hotspot-3" data-spot="Royal Theatre Entrance" style="top: 70%; left: 75%;"><i class="fa-solid fa-crosshairs"></i></div>
+              <svg class="blueprint-vector" viewBox="0 0 400 200">
+                <rect x="40" y="20" width="320" height="160" fill="none" stroke="rgba(0, 242, 254, 0.4)" stroke-width="2" stroke-dasharray="4,4"></rect>
+                <path d="M 40 100 Q 200 40 360 100 Q 200 160 40 100" fill="none" stroke="rgba(0, 242, 254, 0.2)" stroke-width="2"></path>
+              </svg>
+            </div>
+
+            <div class="blueprint-graphic" id="blueprintEngine">
+              <div class="blueprint-hotspot hotspot-1" data-spot="Dynamic Azipod Controller" style="top: 45%; left: 40%;"><i class="fa-solid fa-crosshairs"></i></div>
+              <div class="blueprint-hotspot hotspot-2" data-spot="Dual Marine Diesel Generators" style="top: 60%; left: 75%;"><i class="fa-solid fa-crosshairs"></i></div>
+              <div class="blueprint-hotspot hotspot-3" data-spot="Fuel Separation Grid" style="top: 25%; left: 15%;"><i class="fa-solid fa-crosshairs"></i></div>
+              <svg class="blueprint-vector" viewBox="0 0 400 200">
+                <rect x="20" y="20" width="360" height="160" fill="none" stroke="rgba(0, 242, 254, 0.4)" stroke-width="2" stroke-dasharray="4,4"></rect>
+                <rect x="60" y="50" width="100" height="100" fill="none" stroke="rgba(0, 242, 254, 0.2)" stroke-width="2"></rect>
+                <rect x="240" y="50" width="100" height="100" fill="none" stroke="rgba(0, 242, 254, 0.2)" stroke-width="2"></rect>
+              </svg>
+            </div>
+          </div>
+          <div class="blueprint-legend">
+            <span class="legend-interactive"><i class="fa-solid fa-crosshairs"></i> Hover hotspots for spatial details</span>
+          </div>
+        </div>
+
+        <div class="deck-details-panel">
+          <span class="deck-badge" id="deckBadge">COMPARTMENT SURVEY</span>
+          <h3 id="deckName">Captain's Bridge</h3>
+          <p id="deckDesc">Positioned forward at the highest vantage point. Features panoramic windows offering a 270-degree view of harbor approaches. Connects directly to navigation tables, electronic charting computers, and local satellite arrays.</p>
+          <hr class="deck-divider">
+          <div class="deck-features-grid">
+            <div class="deck-feat-item">
+              <i class="fa-solid fa-temperature-arrow-up"></i>
+              <div>
+                <span class="df-lbl">Climate Zone</span>
+                <span class="df-val" id="deckTemp">71°F - Stable</span>
+              </div>
+            </div>
+            <div class="deck-feat-item">
+              <i class="fa-solid fa-shield-halved"></i>
+              <div>
+                <span class="df-lbl">Security Rating</span>
+                <span class="df-val" id="deckSecurity">LEVEL 5 ACCESS</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- CAPTAIN'S BRIDGE MINI-SIMULATOR -->
   <section id="simulator" class="simulator-section">
     <div class="section-header">
       <h2 class="section-title">THE CAPTAIN'S BRIDGE</h2>
       <p class="section-subtitle">Take control of the bridge instruments in this interactive web deck. Practice steering and monitor the radar scan!</p>
       <div class="section-line"></div>
+    </div>
+
+    <!-- HUD Theme Selector palette -->
+    <div class="hud-palette-selector">
+      <span class="palette-label">HUD PALETTE THEME:</span>
+      <div class="palette-colors">
+        <button class="palette-btn color-cyan active" data-theme="cyan" title="Cyber Cyan"></button>
+        <button class="palette-btn color-amber" data-theme="amber" title="Vintage Amber"></button>
+        <button class="palette-btn color-red" data-theme="red" title="Crimson Warning"></button>
+        <button class="palette-btn color-ocean" data-theme="ocean" title="Deep Blue Sea"></button>
+      </div>
     </div>
 
     <div class="simulator-layout">
@@ -344,12 +465,7 @@
             <button class="alarm-btn" id="alarmBtn">
               <i class="fa-solid fa-bell"></i> TURN ON EVAC ALARM
             </button>
-            <button class="audio-upload-btn" id="audioUploadBtn">
-              <i class="fa-solid fa-cloud-arrow-up"></i> UPLOAD CUSTOM ALARM
-            </button>
-            <input type="file" id="audioFileInput" accept="audio/*" style="display: none;">
-            <div class="horn-tooltip">Uses local audio, custom uploads, or dynamic synthesis fallback</div>
-            <div class="upload-status" id="uploadStatus"></div>
+            <div class="horn-tooltip">Uses local audio with dynamic synthesis fallback</div>
           </div>
         </div>
       </div>
@@ -374,6 +490,24 @@
             <button class="steer-btn" id="steerLeft"><i class="fa-solid fa-rotate-left"></i> Port</button>
             <button class="steer-btn" id="steerCenter">Center</button>
             <button class="steer-btn" id="steerRight">Starboard <i class="fa-solid fa-rotate-right"></i></button>
+          </div>
+        </div>
+
+        <!-- Wind & Wave Environmental Simulators -->
+        <div class="control-card env-simulation-card">
+          <h4>Environmental Physics Controls</h4>
+          <p class="control-help">Simulate extreme weather patterns. High wind & wave speeds cause ship drifting and telemetry disturbances.</p>
+
+          <div class="env-controls-grid">
+            <div class="env-slider-wrapper">
+              <label for="windSlider">Wind Speed: <span id="windReadout">10 KTS</span></label>
+              <input type="range" min="0" max="60" value="10" class="env-slider" id="windSlider">
+            </div>
+
+            <div class="env-slider-wrapper">
+              <label for="waveSlider">Wave Swell Height: <span id="waveReadout">1.5m</span></label>
+              <input type="range" min="0" max="15" step="0.5" value="1.5" class="env-slider" id="waveSlider">
+            </div>
           </div>
         </div>
 
@@ -456,7 +590,7 @@
           <i class="fa-solid fa-chevron-down faq-icon"></i>
         </button>
         <div class="faq-content">
-          <p>You earn cash by successfully piloting your current cruise ship to various destinations. Once you acquire enough cash, visit the Shipyard in any major port to purchase larger, more majest[...]
+          <p>You earn cash by successfully piloting your current cruise ship to various destinations. Once you acquire enough cash, visit the Shipyard in any major port to purchase larger, more majestic vessels like the Vista or Oasis classes.</p>
         </div>
       </div>
 
@@ -466,7 +600,7 @@
           <i class="fa-solid fa-chevron-down faq-icon"></i>
         </button>
         <div class="faq-content">
-          <p>Specialty vessels add cooperative gameplay elements! Tugboats can tow larger cruise ships out of tight berths, while LNG (Liquid Natural Gas) carriers can dock next to other vessels at se[...]
+          <p>Specialty vessels add cooperative gameplay elements! Tugboats can tow larger cruise ships out of tight berths, while LNG (Liquid Natural Gas) carriers can dock next to other vessels at sea to refuel them, earning both players extra rewards.</p>
         </div>
       </div>
 
@@ -476,7 +610,7 @@
           <i class="fa-solid fa-chevron-down faq-icon"></i>
         </button>
         <div class="faq-content">
-          <p>Yes, Cruise Ship Simulator is completely free to play on Roblox! Some optional in-game gamepasses and cosmetics are available for purchase using Robux to support Tableboard Studios' conti[...]
+          <p>Yes, Cruise Ship Simulator is completely free to play on Roblox! Some optional in-game gamepasses and cosmetics are available for purchase using Robux to support Tableboard Studios' continuous development.</p>
         </div>
       </div>
 
@@ -486,7 +620,7 @@
           <i class="fa-solid fa-chevron-down faq-icon"></i>
         </button>
         <div class="faq-content">
-          <p>You can join the official Tableboard Studios Roblox Group and follow our communication server links found in the description of the game. Our community regularly hosts special sailing eve[...]
+          <p>You can join the official Tableboard Studios Roblox Group and follow our communication server links found in the description of the game. Our community regularly hosts special sailing events and coordinates beta testing!</p>
         </div>
       </div>
     </div>
@@ -528,6 +662,7 @@
         <a href="#hero">Home</a>
         <a href="#fleet">Fleet</a>
         <a href="#destinations">Destinations</a>
+        <a href="#deck-explorer">Deck Explorer</a>
         <a href="#simulator">Captain's Bridge</a>
       </div>
 

@@ -291,6 +291,76 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
 
+  // --- INTERACTIVE SHIP DECK EXPLORER DATABASE & LOGIC ---
+  const deckData = {
+    "deck-bridge": {
+      name: "Captain's Bridge",
+      badge: "DECK 12 - COMMAND",
+      desc: "Positioned forward at the highest vantage point. Features panoramic windows offering a 270-degree view of harbor approaches. Connects directly to navigation tables, electronic charting computers, and local satellite arrays.",
+      temp: "71°F - Stable",
+      security: "LEVEL 5 ACCESS",
+      blueprintId: "blueprintBridge"
+    },
+    "deck-lido": {
+      name: "Lido Pool & Dining",
+      badge: "DECK 10 - GUEST RECREATION",
+      desc: "An outdoor paradise containing a double-flow infinity edge pool, hot tubs, and tropical beverage shacks. Forward compartments open up to the glass-dome Solarium buffet hall.",
+      temp: "78°F - Pleasant",
+      security: "PUBLIC ACCESS",
+      blueprintId: "blueprintLido"
+    },
+    "deck-promenade": {
+      name: "Royal Promenade",
+      badge: "DECK 05 - SOCIAL HUB",
+      desc: "The heartbeat of the liner. A central glass atrium street lined with boutique duty-free shops, pizzerias, and live karaoke cafes. Forward corridor exits into the main 3-tier theater.",
+      temp: "72°F - Controlled",
+      security: "PUBLIC ACCESS",
+      blueprintId: "blueprintPromenade"
+    },
+    "deck-engine": {
+      name: "Engine Control Room",
+      badge: "DECK 01 - TECHNICAL COMPARTMENT",
+      desc: "Direct monitoring deck for the high-voltage Azipod propulsion units. Standard parameters display RPM meters, fuel separation diagnostics, and direct mechanical throttle override consoles.",
+      temp: "66°F - Cooling Grid",
+      security: "OFFICERS ONLY",
+      blueprintId: "blueprintEngine"
+    }
+  };
+
+  const deckButtons = document.querySelectorAll('.deck-btn');
+  const blueprintGraphics = document.querySelectorAll('.blueprint-graphic');
+  const deckBadge = document.getElementById('deckBadge');
+  const deckName = document.getElementById('deckName');
+  const deckDesc = document.getElementById('deckDesc');
+  const deckTemp = document.getElementById('deckTemp');
+  const deckSecurity = document.getElementById('deckSecurity');
+
+  deckButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      deckButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const deckKey = btn.getAttribute('data-deck');
+      const data = deckData[deckKey];
+
+      // Reset Active Blueprints
+      blueprintGraphics.forEach(bg => {
+        bg.classList.remove('active');
+        if (bg.getAttribute('id') === data.blueprintId) {
+          bg.classList.add('active');
+        }
+      });
+
+      // Update Panel Info
+      deckBadge.textContent = data.badge;
+      deckName.textContent = data.name;
+      deckDesc.textContent = data.desc;
+      deckTemp.textContent = data.temp;
+      deckSecurity.textContent = data.security;
+    });
+  });
+
+
   // --- CAPTAIN'S BRIDGE MINI-SIMULATOR GAMEPLAY ---
   let heading = 0; // Degrees (0 - 359)
   let speedKts = 0.0; // Current Speed
@@ -298,6 +368,10 @@ document.addEventListener('DOMContentLoaded', () => {
   let rudderAngle = 0; // Angle of rudder (-35 to +35 degrees)
   let targetThrust = 0; // Desired thrust percentage from slider (0 - 100)
   let currentThrust = 0; // Actual current engine thrust ramping up/down
+
+  // Environmental modifiers
+  let windSpeed = 10; // Knots
+  let waveHeight = 1.5; // Meters
 
   // DOM bridge elements
   const teleHeading = document.getElementById('teleHeading');
@@ -311,10 +385,27 @@ document.addEventListener('DOMContentLoaded', () => {
   const thrustSlider = document.getElementById('thrustSlider');
   const thrustSliderReadout = document.getElementById('thrustSliderReadout');
 
+  // Env elements
+  const windSlider = document.getElementById('windSlider');
+  const waveSlider = document.getElementById('waveSlider');
+  const windReadout = document.getElementById('windReadout');
+  const waveReadout = document.getElementById('waveReadout');
+
   // Steering controls buttons
   const steerLeft = document.getElementById('steerLeft');
   const steerCenter = document.getElementById('steerCenter');
   const steerRight = document.getElementById('steerRight');
+
+  // Env Listeners
+  windSlider.addEventListener('input', (e) => {
+    windSpeed = +e.target.value;
+    windReadout.textContent = `${windSpeed} KTS`;
+  });
+
+  waveSlider.addEventListener('input', (e) => {
+    waveHeight = +e.target.value;
+    waveReadout.textContent = `${waveHeight.toFixed(1)}m`;
+  });
 
   // --- RADAR CANVAS SIMULATION RENDERING ---
   const canvas = document.getElementById('radarCanvas');
@@ -330,6 +421,15 @@ document.addEventListener('DOMContentLoaded', () => {
   ];
 
   const drawRadarBlips = () => {
+    let activeThemeColor = "rgba(0, 242, 254,"; // Default Cyan
+    const currentTheme = simulatorSection.classList.contains('theme-amber') ? "amber" :
+                         simulatorSection.classList.contains('theme-red') ? "red" :
+                         simulatorSection.classList.contains('theme-ocean') ? "ocean" : "cyan";
+
+    if (currentTheme === "amber") activeThemeColor = "rgba(241, 196, 15,";
+    if (currentTheme === "red") activeThemeColor = "rgba(231, 76, 60,";
+    if (currentTheme === "ocean") activeThemeColor = "rgba(79, 172, 254,";
+
     blips.forEach(blip => {
       // Calculate coordinates relative to center
       const angleRad = (blip.angle - heading - 90) * (Math.PI / 180);
@@ -340,18 +440,18 @@ document.addEventListener('DOMContentLoaded', () => {
       // Draw blip halo/pulse
       ctx.beginPath();
       ctx.arc(x, y, blip.size * (1 + blip.pulse * 0.4), 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(0, 242, 254, ${0.1 * blip.pulse})`;
+      ctx.fillStyle = `${activeThemeColor}${0.1 * blip.pulse})`;
       ctx.fill();
 
       // Draw solid blip center
       ctx.beginPath();
       ctx.arc(x, y, blip.size / 2, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(0, 242, 254, ${blip.pulse})`;
+      ctx.fillStyle = `${activeThemeColor}${blip.pulse})`;
       ctx.fill();
 
       // Draw text label
       ctx.font = "7px 'Orbitron', sans-serif";
-      ctx.fillStyle = "rgba(0, 242, 254, 0.6)";
+      ctx.fillStyle = `${activeThemeColor}0.6)`;
       ctx.fillText(blip.label, x + blip.size, y + 3);
 
       // Pulse fade cycling
@@ -386,28 +486,36 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     teleThrust.textContent = `${Math.round(currentThrust)}%`;
 
-    // 2. Speed formula based on current thrust and inertia
+    // 2. Speed formula based on current thrust and inertia, altered by wave resistance
     const maxSpeed = 24.5; // knots
-    const theoreticalSpeed = (currentThrust / 100) * maxSpeed;
+    const waveResistanceRatio = Math.max(0.7, 1 - (waveHeight * 0.02)); // high waves slow down maximum output speed
+    const theoreticalSpeed = (currentThrust / 100) * maxSpeed * waveResistanceRatio;
     const speedDiff = theoreticalSpeed - speedKts;
     speedKts += speedDiff * 0.015; // slow speed adjustment to simulate heavy ship mass
     teleSpeed.textContent = `${speedKts.toFixed(1)} KTS`;
 
-    // 3. Rudder effect based on velocity
+    // 3. Rudder effect based on velocity and wind drift forces
+    const windDriftRate = (windSpeed / 60) * (Math.sin(Date.now() / 4000) * 0.15); // winds cause heading drift
     if (speedKts > 0.1) {
       // Turning speed depends on current speed and rudder angle
       const turnRate = (rudderAngle / 35) * (speedKts / maxSpeed) * 0.8;
-      heading = (heading + turnRate + 360) % 360;
+      heading = (heading + turnRate + windDriftRate + 360) % 360;
+    } else {
+      // Wind drifts ship slowly even when stationary
+      heading = (heading + windDriftRate + 360) % 360;
     }
 
     // Format heading text
     const roundedHeading = Math.round(heading);
     teleHeading.textContent = `${roundedHeading.toString().padStart(3, '0')}°`;
 
-    // 4. Update Depth depending on speed and slight noise
+    // 4. Update Depth depending on speed and slight wave swells
+    const swellNoise = Math.sin(Date.now() / 1500) * (waveHeight * 0.2);
     if (speedKts > 0.5) {
-      depth += (Math.sin(Date.now() / 8000) * 0.1) - (speedKts * 0.01);
+      depth += (Math.sin(Date.now() / 8000) * 0.1) - (speedKts * 0.01) + swellNoise * 0.02;
       if (depth < 10) depth = 120.0; // reset/wrap
+    } else {
+      depth += swellNoise * 0.01;
     }
     teleDepth.textContent = `${depth.toFixed(1)} M`;
 
@@ -415,8 +523,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (depth < 15.0) {
       teleAlert.textContent = "SHALLOW WATER";
       teleAlert.className = "tele-val value-alert";
-    } else if (speedKts > 22.0) {
-      teleAlert.textContent = "CRITICAL VELOCITY";
+    } else if (windSpeed > 45.0) {
+      teleAlert.textContent = "EXTREME WIND GUSTS";
+      teleAlert.className = "tele-val value-alert";
+    } else if (isAlarmPlaying) {
+      teleAlert.textContent = "GENERAL EMERGENCY ALARM";
       teleAlert.className = "tele-val value-alert";
     } else {
       teleAlert.textContent = "CLEAR / NORMAL";
@@ -626,7 +737,6 @@ document.addEventListener('DOMContentLoaded', () => {
   let alarmAudio = null;
   let isAlarmPlaying = false;
   let synthAlarmInterval = null;
-  let customAlarmAudio = null; // Store user-uploaded audio
 
   // Track active synthesized nodes to force terminate them immediately when turning off the alarm
   let activeSynthOscillators = [];
@@ -720,22 +830,23 @@ document.addEventListener('DOMContentLoaded', () => {
       teleAlert.textContent = "GENERAL EMERGENCY ALARM";
       teleAlert.className = "tele-val value-alert";
 
-      // Priority: Use custom uploaded audio if available
-      if (customAlarmAudio) {
-        customAlarmAudio.currentTime = 0;
-        customAlarmAudio.loop = true;
-        customAlarmAudio.play()
-          .then(() => {
-            console.log("Custom alarm audio played successfully.");
-          })
-          .catch(err => {
-            console.warn("Custom audio playback failed, falling back to synthesis...", err);
-            playSynthesizedEmergencyAlarm();
-          });
-      } else {
-        // Fallback to synthesized alarm
-        playSynthesizedEmergencyAlarm();
+      // Attempt to load and play user's local absolute Windows file path
+      const filePath = "C:\\Users\\stude\\Music\\MP3Skull\\Cruise Ship Emergency Alarm, Evacuation Lifejacket Instructions & Prohibitions (Carnival Cruise).mp3";
+
+      if (!alarmAudio) {
+        alarmAudio = new Audio(filePath);
+        alarmAudio.loop = true;
       }
+
+      alarmAudio.play()
+        .then(() => {
+          console.log("Local audio played successfully.");
+        })
+        .catch(err => {
+          console.warn("Local absolute file access is blocked by browser security sandbox policies. Falling back to dynamic procedural Web Audio synthesis...", err);
+          // Launch synthesis engine
+          playSynthesizedEmergencyAlarm();
+        });
 
     } else {
       alarmBtn.classList.remove('active');
@@ -744,10 +855,10 @@ document.addEventListener('DOMContentLoaded', () => {
       teleAlert.textContent = "CLEAR / NORMAL";
       teleAlert.className = "tele-val value-green";
 
-      // 1. Stop custom audio if playing
-      if (customAlarmAudio) {
-        customAlarmAudio.pause();
-        customAlarmAudio.currentTime = 0;
+      // 1. Stop local absolute Audio if playing
+      if (alarmAudio) {
+        alarmAudio.pause();
+        alarmAudio.currentTime = 0;
       }
 
       // 2. Stop scheduled Synth timeouts
@@ -775,59 +886,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // --- AUDIO FILE UPLOAD HANDLER ---
-  const audioUploadBtn = document.getElementById('audioUploadBtn');
-  const audioFileInput = document.getElementById('audioFileInput');
-  const uploadStatus = document.getElementById('uploadStatus');
-
-  audioUploadBtn.addEventListener('click', () => {
-    audioFileInput.click();
-  });
-
-  audioFileInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    // Validate file size (max 50MB)
-    const maxSize = 50 * 1024 * 1024; // 50MB in bytes
-    if (file.size > maxSize) {
-      uploadStatus.textContent = '❌ File too large (max 50MB)';
-      uploadStatus.style.color = '#e74c3c';
-      setTimeout(() => {
-        uploadStatus.textContent = '';
-      }, 3000);
-      return;
-    }
-
-    // Validate file type
-    const validTypes = ['audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/webm', 'audio/mp4'];
-    if (!validTypes.includes(file.type)) {
-      uploadStatus.textContent = '❌ Invalid audio format (MP3, WAV, OGG, WebM supported)';
-      uploadStatus.style.color = '#e74c3c';
-      setTimeout(() => {
-        uploadStatus.textContent = '';
-      }, 3000);
-      return;
-    }
-
-    // Create blob URL from file
-    const audioURL = URL.createObjectURL(file);
-    
-    // Create audio element and set source
-    customAlarmAudio = new Audio();
-    customAlarmAudio.src = audioURL;
-    
-    // Show success message
-    uploadStatus.textContent = `✓ Loaded: ${file.name}`;
-    uploadStatus.style.color = '#2ecc71';
-    audioUploadBtn.innerHTML = `<i class="fa-solid fa-check"></i> CUSTOM ALARM LOADED`;
-    audioUploadBtn.style.background = 'linear-gradient(135deg, #2ecc71 0%, #27ae60 100%)';
-
-    setTimeout(() => {
-      uploadStatus.textContent = '';
-    }, 4000);
-  });
-
   // --- FAQ ACCORDION INTERACTIVITY ---
   const faqToggles = document.querySelectorAll('.faq-toggle');
 
@@ -852,6 +910,26 @@ document.addEventListener('DOMContentLoaded', () => {
           item.querySelector('.faq-content').style.maxHeight = 0;
         }
       });
+    });
+  });
+
+  // --- HUD THEME PALETTE COLOR SWITCHER EVENT ROUTING ---
+  const paletteBtns = document.querySelectorAll('.palette-btn');
+
+  paletteBtns.forEach(pbtn => {
+    pbtn.addEventListener('click', () => {
+      paletteBtns.forEach(p => p.classList.remove('active'));
+      pbtn.classList.add('active');
+
+      const theme = pbtn.getAttribute('data-theme');
+
+      // Clear all theme overrides
+      simulatorSection.classList.remove('theme-cyan', 'theme-amber', 'theme-red', 'theme-ocean');
+
+      // Inject new override class if not default (cyan)
+      if (theme !== 'cyan') {
+        simulatorSection.classList.add(`theme-${theme}`);
+      }
     });
   });
 
